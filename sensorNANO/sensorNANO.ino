@@ -132,12 +132,12 @@ void NivelTanque() {
 
 void Infrarrojo(){
   newDist= analogRead(pin_Infrarrojo);
-  if ((newDist > 111) && (newDist < 1200) {    // lee solo si sensa entre 110cm y 18cm
+  if ((newDist > 111) && (newDist < 1200)) {    // lee solo si el sensa entre 110cm y 18cm
      newDist = 9462/(newDist - 16.92);
      promedioDist = Promedio(newDist, listDist, 20) + 10; // 10cm para conseguir distancia real
-     aguaLlenando = 0;
+     valorAguaBajo = 0;
   } else {
-     if (aguaLlenando < 9) { aguaLlenando++; }
+     if (valorAguaBajo < 9) { valorAguaBajo++; }
   }
 }
 

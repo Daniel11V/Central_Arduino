@@ -316,6 +316,8 @@ void Receptor() {
   
   if ( myRadio.available()) {
     myRadio.read( &data, sizeof(data) );
+    //Serial.print("Data Receved: ");
+    //Serial.println(data.aguaLlenando, DEC);
 ///////////
 //    if (data.nivelAgua >= 900) {nivel = 0;} else if (data.nivelAgua <= 202) {nivel = 99;} else {nivel = (900 - float (data.nivelAgua)) / 7;}
 //    if (nivel == 99) {nivel_barra = 10;} else {nivel_barra = nivel / 10;}
@@ -330,7 +332,7 @@ void Receptor() {
     if (nivel == 99) {nivel_barra = 10;} else {nivel_barra = nivel / 10;}
 /////////////
     aguaLlena = data.aguaLlena;
-    t = data.aguaLlenando;
+    aguaLlenando = data.aguaLlenando;
     enviosGuardo = enviosLlego;
     enviosLlego = data.id;
     //if (enviosGuardo == enviosLlego) {
