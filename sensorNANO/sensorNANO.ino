@@ -68,7 +68,7 @@ void setup() {
 void loop() {
   BaseTiempo();
   Titilar10S();
-  NivelTanque();
+  //NivelTanque();
   if (base_s) {  //Saque el iniciar
     base_s3++;
     if (base_s3 == 1){
@@ -113,7 +113,7 @@ void Titilar10S() {
   }
 }
 
-void NivelTanque() {
+void NivelTanque() {   // EN DESHUSO
   if (base_s && agua_nivel == 0) {
     digitalWrite(9, HIGH);// prendemos pin 9 durante 10 microsegundos;
     agua_nivel = 1;
