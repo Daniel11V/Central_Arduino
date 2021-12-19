@@ -149,6 +149,7 @@ bool sinConeccion = false;
 char temperatura = 27;
 char nivel = 70;
 char nivelsonar = 1;
+char nivelError = 0;
 char nivelMin = 100;
 char nivelMax = 0;
 char nivelIni = 0;
@@ -161,7 +162,7 @@ int hist[9][7] = {};
 bool tip_sensor = true; //true=Infrarrojo;false=Luz;
 
 char aguaLlena;
-char aguaLlenando;
+char nivelErrorNano;
 
 bool bomba = true;
 char bomba1 = 34;
@@ -315,24 +316,15 @@ void Receptor() {
   }
   
   if ( myRadio.available()) {
-    myRadio.read( &data, sizeof(data) );
-    //Serial.print("Data Receved: ");
-    //Serial.println(data.aguaLlenando, DEC);
-///////////
-//    if (data.nivelAgua >= 900) {nivel = 0;} else if (data.nivelAgua <= 202) {nivel = 99;} else {nivel = (900 - float (data.nivelAgua)) / 7;}
-//    if (nivel == 99) {nivel_barra = 10;} else {nivel_barra = nivel / 10;}
-/////////////
-    if (data.nivelAguaInf <= 25) {
-      nivel = 0; 
-    } else if (data.nivelAguaInf >= 100) {
-      nivel = 99;
-    } else {
+    myRadio.read( &data, sizeof(data) ); 
+    if (data.nivelAguaInf > 25 && data.nivelAguaInf < 100) {
       nivel = (1000 - float (data.nivelAguaInf) * 10) / ((100-25)/10); 
-    }
+      nivelError = 0; 
+    } else if (nivelError < 9) { nivelError++; }
     if (nivel == 99) {nivel_barra = 10;} else {nivel_barra = nivel / 10;}
 /////////////
     aguaLlena = data.aguaLlena;
-    aguaLlenando = data.aguaLlenando;
+    nivelErrorNano = data.aguaLlenando;
     enviosGuardo = enviosLlego;
     enviosLlego = data.id;
     //if (enviosGuardo == enviosLlego) {
@@ -580,14 +572,6 @@ void Menu0() {
     if (base_men == 1){lcd.write(byte(4));}
     if (base_men == 2){lcd.write(byte(5)); base_men = 0;} else {base_men++;}
   }
-  
-//  if (aguaLlena == 0) {
-//    lcd.write(byte(5));
-//  } else if (aguaLlenando == 0) {
-//    if (base_men == 0){lcd.write(byte(3));} 
-//    if (base_men == 1){lcd.write(byte(4));}
-//    if (base_men == 2){lcd.write(byte(5)); base_men = 0;} else {base_men++;}
-//  }
 }
 
 void AguaNivel(char nivelR, bool nivelSubiendoR, bool nivelBajandoR, char nivel_barraR) {
@@ -609,8 +593,10 @@ void AguaNivel(char nivelR, bool nivelSubiendoR, bool nivelBajandoR, char nivel_
       lcd.write(byte(0));
     }
   }
+  lcd.setCursor(12,1);
+  if (nivelError > 0) { lcd.print(nivelError, DEC); }
   lcd.setCursor(13,1);
-  if (aguaLlenando > 0) { lcd.print(aguaLlenando, DEC); }
+  if (nivelErrorNano > 0) { lcd.print(nivelErrorNano, DEC); }
   lcd.setCursor(14,1);
   lcd.print("]");
 }
