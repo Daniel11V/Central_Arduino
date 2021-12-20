@@ -160,6 +160,7 @@ bool nivelBajando = false;
 char nivel_barra = 7;
 int hist[9][7] = {};
 bool tip_sensor = true; //true=Infrarrojo;false=Luz;
+bool noSeLleno = false;
 
 char aguaLlena;
 char nivelErrorNano;
@@ -183,6 +184,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(39, OUTPUT);
   pinMode(37, OUTPUT);
+  pinMode(33, OUTPUT);
   if (! rtc.begin()) {
 //    Serial.println("Couldn't find RTC");
     while (1);
@@ -322,35 +324,28 @@ void Receptor() {
       nivelError = 0; 
     } else if (nivelError < 9) { nivelError++; }
     if (nivel == 99) {nivel_barra = 10;} else {nivel_barra = nivel / 10;}
-/////////////
+    
+    /////////////
     aguaLlena = data.aguaLlena;
     nivelErrorNano = data.aguaLlenando;
     enviosGuardo = enviosLlego;
     enviosLlego = data.id;
-    //if (enviosGuardo == enviosLlego) {
-    //  if (enviosFallas >= 5) {
-    //    sinConeccion = true;
-    //  } else {
-    //    enviosFallas++;
-    //  }
-    //} else {
-    //  enviosFallas = 0;
-    //  sinConeccion = false;
-    //}
     ///////////////////////////
     
-    if (nivel > 35) {nivelsonar = 1;}
-    if (nivel <= 25 && nivelsonar == 1) {
-      DateTime now = rtc.now();
+    DateTime now = rtc.now();
+    if (nivel > 40) {nivelsonar = 1;}
+    if (nivel <= 30 && nivelsonar == 1) {
       if(now.hour() > 7 && now.hour() < 23) { beep = 4;}
       nivelsonar = 0;
     }
 
+    if (nivel > 70) { digitalWrite(33, LOW); noSeLleno = false;}
+    if (nivel < 60 && now.hour() > 5 && now.hour() < 9 && !noSeLleno) {digitalWrite(33, HIGH); noSeLleno = true;} 
     if (nivelMin > nivel) {nivelMin = nivel; nivel_s = 0;}
     if (nivelMax < nivel) {nivelMax = nivel; nivel_s = 0;}
 
     //Comienza a subir
-    if (nivelMin + 2 <= nivel && !nivelSubiendo) {
+    if (nivelMin + 3 <= nivel && !nivelSubiendo) {
       nivel_s = 0;
       nivelSubiendo = true;
       nivelBajando = false;
@@ -359,7 +354,7 @@ void Receptor() {
     }
 
     //Comienza bajar 
-    if (nivelMax - 2 >= nivel && !nivelBajando) {
+    if (nivelMax - 3 >= nivel && !nivelBajando) {
       nivel_s = 0;
       nivelBajando = true;
       if (nivelSubiendo) {nuevoHistorial();}
@@ -435,6 +430,8 @@ void nuevoHistorial() {
 }
 
 void ajustarTeclas() {
+  noSeLleno = false;
+  
   if (beep == 4 || beep == 401 || beep == 402) {
     beep = 0;
     beepSalida = false;
