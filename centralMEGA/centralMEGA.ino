@@ -339,7 +339,7 @@ void Receptor() {
       nivelsonar = 0;
     }
 
-    if (nivel > 70) { digitalWrite(33, LOW); noSeLleno = false;}
+    if (nivel > 70 || now.hour() == 1) { digitalWrite(33, LOW); noSeLleno = false;}
     if (nivel < 60 && now.hour() > 5 && now.hour() < 9 && !noSeLleno) {digitalWrite(33, HIGH); noSeLleno = true;} 
     if (nivelMin > nivel) {nivelMin = nivel; nivel_s = 0;}
     if (nivelMax < nivel) {nivelMax = nivel; nivel_s = 0;}
